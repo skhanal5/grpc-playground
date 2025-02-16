@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+option go_package = "./grpc-playground";
+
+
+service Server {
+
+    // Simple unary RPC
+    //
+    // Given a name of a server, get its corresponding Status
+    // If the name doesn't exist, return a Status with an empty name
+    rpc GetPlayer(Player) returns (PlayerSummary) {}
+
+    rpc GetMatchHistory(Player) returns (stream MatchResult) {}
+
+    rpc SendUpcomingMatches(stream UpcomingMatch) returns (stream MatchSummary) {}
+
+    rpc ProcessMatchResults(stream MatchResult) returns (stream MatchResult) {}
+}
+
+message Player {
+    int32 player_id = 1;
+}
+
+enum Rank {
+    RANK_UNSPECIFIED = 0;
+    RANK_BRONZE = 1;
+    RANK_SILVER = 2;
+    RANK_GOLD = 3;
+    RANK_PLATINUM = 4;
+    RANK_DIAMOND = 5;
+    RANK_MASTER = 6;
+    RANK_FINAL = 7;
+}
+
+message PlayerSummary {
+    int32 player_id = 1;
+    string name = 2;
+    Rank rank = 3;
+    int32 elo = 4;
+}
+
+enum Result {
+    RESULT_UNSPECIFIED = 0;
+    RESULT_WIN = 1;
+    RESULT_LOSS = 2;
+    RESULT_DRAW = 3;
+}
+
+message MatchResult {
+    int32 player = 1;// could be a Player instead
+    int32 opponent = 2;
+    Result result = 3;
+    string timestamp = 4;
+    int32 elo_gain = 5;
+    int32 elo_loss = 6;
+}
+
+message UpcomingMatch {
+    int32 player = 1; // could be a Player instead
+    int32 opponent = 2;
+    string timestamp = 3;
+    int32 elo_gain = 4;
+}
+
+message MatchSummary {
+    int32 player = 1;
+    int32 num_matches = 2;
+    int32 avg_elo_gain = 3;
+}
+
