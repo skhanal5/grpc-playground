@@ -4,7 +4,7 @@
 // - protoc             v5.29.3
 // source: player/system.proto
 
-package grpc_playground
+package player
 
 import (
 	context "context"
@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Matches_GetPlayer_FullMethodName           = "/Matches/GetPlayer"
-	Matches_GetMatchHistory_FullMethodName     = "/Matches/GetMatchHistory"
-	Matches_SendUpcomingMatches_FullMethodName = "/Matches/SendUpcomingMatches"
-	Matches_ProcessMatchResults_FullMethodName = "/Matches/ProcessMatchResults"
+	Matches_GetPlayer_FullMethodName           = "/player.Matches/GetPlayer"
+	Matches_GetMatchHistory_FullMethodName     = "/player.Matches/GetMatchHistory"
+	Matches_SendUpcomingMatches_FullMethodName = "/player.Matches/SendUpcomingMatches"
+	Matches_ProcessMatchResults_FullMethodName = "/player.Matches/ProcessMatchResults"
 )
 
 // MatchesClient is the client API for Matches service.
@@ -35,7 +35,7 @@ type MatchesClient interface {
 	// If the name doesn't exist, return a Status with an empty name
 	GetPlayer(ctx context.Context, in *Player, opts ...grpc.CallOption) (*PlayerSummary, error)
 	GetMatchHistory(ctx context.Context, in *Player, opts ...grpc.CallOption) (grpc.ServerStreamingClient[MatchResult], error)
-	SendUpcomingMatches(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[UpcomingMatch, MatchSummary], error)
+	SendUpcomingMatches(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpcomingMatch, MatchSummary], error)
 	ProcessMatchResults(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MatchResult, MatchResult], error)
 }
 
@@ -76,7 +76,7 @@ func (c *matchesClient) GetMatchHistory(ctx context.Context, in *Player, opts ..
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type Matches_GetMatchHistoryClient = grpc.ServerStreamingClient[MatchResult]
 
-func (c *matchesClient) SendUpcomingMatches(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[UpcomingMatch, MatchSummary], error) {
+func (c *matchesClient) SendUpcomingMatches(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpcomingMatch, MatchSummary], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &Matches_ServiceDesc.Streams[1], Matches_SendUpcomingMatches_FullMethodName, cOpts...)
 	if err != nil {
@@ -87,7 +87,7 @@ func (c *matchesClient) SendUpcomingMatches(ctx context.Context, opts ...grpc.Ca
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Matches_SendUpcomingMatchesClient = grpc.BidiStreamingClient[UpcomingMatch, MatchSummary]
+type Matches_SendUpcomingMatchesClient = grpc.ClientStreamingClient[UpcomingMatch, MatchSummary]
 
 func (c *matchesClient) ProcessMatchResults(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MatchResult, MatchResult], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -112,7 +112,7 @@ type MatchesServer interface {
 	// If the name doesn't exist, return a Status with an empty name
 	GetPlayer(context.Context, *Player) (*PlayerSummary, error)
 	GetMatchHistory(*Player, grpc.ServerStreamingServer[MatchResult]) error
-	SendUpcomingMatches(grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]) error
+	SendUpcomingMatches(grpc.ClientStreamingServer[UpcomingMatch, MatchSummary]) error
 	ProcessMatchResults(grpc.BidiStreamingServer[MatchResult, MatchResult]) error
 	mustEmbedUnimplementedMatchesServer()
 }
@@ -130,7 +130,7 @@ func (UnimplementedMatchesServer) GetPlayer(context.Context, *Player) (*PlayerSu
 func (UnimplementedMatchesServer) GetMatchHistory(*Player, grpc.ServerStreamingServer[MatchResult]) error {
 	return status.Errorf(codes.Unimplemented, "method GetMatchHistory not implemented")
 }
-func (UnimplementedMatchesServer) SendUpcomingMatches(grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]) error {
+func (UnimplementedMatchesServer) SendUpcomingMatches(grpc.ClientStreamingServer[UpcomingMatch, MatchSummary]) error {
 	return status.Errorf(codes.Unimplemented, "method SendUpcomingMatches not implemented")
 }
 func (UnimplementedMatchesServer) ProcessMatchResults(grpc.BidiStreamingServer[MatchResult, MatchResult]) error {
@@ -191,7 +191,7 @@ func _Matches_SendUpcomingMatches_Handler(srv interface{}, stream grpc.ServerStr
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Matches_SendUpcomingMatchesServer = grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]
+type Matches_SendUpcomingMatchesServer = grpc.ClientStreamingServer[UpcomingMatch, MatchSummary]
 
 func _Matches_ProcessMatchResults_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(MatchesServer).ProcessMatchResults(&grpc.GenericServerStream[MatchResult, MatchResult]{ServerStream: stream})
@@ -204,7 +204,7 @@ type Matches_ProcessMatchResultsServer = grpc.BidiStreamingServer[MatchResult, M
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Matches_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Matches",
+	ServiceName: "player.Matches",
 	HandlerType: (*MatchesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -221,7 +221,6 @@ var Matches_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "SendUpcomingMatches",
 			Handler:       _Matches_SendUpcomingMatches_Handler,
-			ServerStreams: true,
 			ClientStreams: true,
 		},
 		{

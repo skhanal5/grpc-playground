@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-option go_package = "./grpc-playground";
+option go_package = "./player";
+
+package player;
 
 
 service Matches {
@@ -13,7 +15,7 @@ service Matches {
 
     rpc GetMatchHistory(Player) returns (stream MatchResult) {}
 
-    rpc SendUpcomingMatches(stream UpcomingMatch) returns (stream MatchSummary) {}
+    rpc SendUpcomingMatches(stream UpcomingMatch) returns (MatchSummary) {}
 
     rpc ProcessMatchResults(stream MatchResult) returns (stream MatchResult) {}
 }
