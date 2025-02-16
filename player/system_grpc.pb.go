@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Server_GetPlayer_FullMethodName           = "/Server/GetPlayer"
-	Server_GetMatchHistory_FullMethodName     = "/Server/GetMatchHistory"
-	Server_SendUpcomingMatches_FullMethodName = "/Server/SendUpcomingMatches"
-	Server_ProcessMatchResults_FullMethodName = "/Server/ProcessMatchResults"
+	Matches_GetPlayer_FullMethodName           = "/Matches/GetPlayer"
+	Matches_GetMatchHistory_FullMethodName     = "/Matches/GetMatchHistory"
+	Matches_SendUpcomingMatches_FullMethodName = "/Matches/SendUpcomingMatches"
+	Matches_ProcessMatchResults_FullMethodName = "/Matches/ProcessMatchResults"
 )
 
-// ServerClient is the client API for Server service.
+// MatchesClient is the client API for Matches service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ServerClient interface {
+type MatchesClient interface {
 	// Simple unary RPC
 	//
 	// Given a name of a server, get its corresponding Status
@@ -39,27 +39,27 @@ type ServerClient interface {
 	ProcessMatchResults(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MatchResult, MatchResult], error)
 }
 
-type serverClient struct {
+type matchesClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewServerClient(cc grpc.ClientConnInterface) ServerClient {
-	return &serverClient{cc}
+func NewMatchesClient(cc grpc.ClientConnInterface) MatchesClient {
+	return &matchesClient{cc}
 }
 
-func (c *serverClient) GetPlayer(ctx context.Context, in *Player, opts ...grpc.CallOption) (*PlayerSummary, error) {
+func (c *matchesClient) GetPlayer(ctx context.Context, in *Player, opts ...grpc.CallOption) (*PlayerSummary, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PlayerSummary)
-	err := c.cc.Invoke(ctx, Server_GetPlayer_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, Matches_GetPlayer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serverClient) GetMatchHistory(ctx context.Context, in *Player, opts ...grpc.CallOption) (grpc.ServerStreamingClient[MatchResult], error) {
+func (c *matchesClient) GetMatchHistory(ctx context.Context, in *Player, opts ...grpc.CallOption) (grpc.ServerStreamingClient[MatchResult], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Server_ServiceDesc.Streams[0], Server_GetMatchHistory_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Matches_ServiceDesc.Streams[0], Matches_GetMatchHistory_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,11 +74,11 @@ func (c *serverClient) GetMatchHistory(ctx context.Context, in *Player, opts ...
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Server_GetMatchHistoryClient = grpc.ServerStreamingClient[MatchResult]
+type Matches_GetMatchHistoryClient = grpc.ServerStreamingClient[MatchResult]
 
-func (c *serverClient) SendUpcomingMatches(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[UpcomingMatch, MatchSummary], error) {
+func (c *matchesClient) SendUpcomingMatches(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[UpcomingMatch, MatchSummary], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Server_ServiceDesc.Streams[1], Server_SendUpcomingMatches_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Matches_ServiceDesc.Streams[1], Matches_SendUpcomingMatches_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,11 +87,11 @@ func (c *serverClient) SendUpcomingMatches(ctx context.Context, opts ...grpc.Cal
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Server_SendUpcomingMatchesClient = grpc.BidiStreamingClient[UpcomingMatch, MatchSummary]
+type Matches_SendUpcomingMatchesClient = grpc.BidiStreamingClient[UpcomingMatch, MatchSummary]
 
-func (c *serverClient) ProcessMatchResults(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MatchResult, MatchResult], error) {
+func (c *matchesClient) ProcessMatchResults(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[MatchResult, MatchResult], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Server_ServiceDesc.Streams[2], Server_ProcessMatchResults_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Matches_ServiceDesc.Streams[2], Matches_ProcessMatchResults_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,12 +100,12 @@ func (c *serverClient) ProcessMatchResults(ctx context.Context, opts ...grpc.Cal
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Server_ProcessMatchResultsClient = grpc.BidiStreamingClient[MatchResult, MatchResult]
+type Matches_ProcessMatchResultsClient = grpc.BidiStreamingClient[MatchResult, MatchResult]
 
-// ServerServer is the server API for Server service.
-// All implementations must embed UnimplementedServerServer
+// MatchesServer is the server API for Matches service.
+// All implementations must embed UnimplementedMatchesServer
 // for forward compatibility.
-type ServerServer interface {
+type MatchesServer interface {
 	// Simple unary RPC
 	//
 	// Given a name of a server, get its corresponding Status
@@ -114,119 +114,119 @@ type ServerServer interface {
 	GetMatchHistory(*Player, grpc.ServerStreamingServer[MatchResult]) error
 	SendUpcomingMatches(grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]) error
 	ProcessMatchResults(grpc.BidiStreamingServer[MatchResult, MatchResult]) error
-	mustEmbedUnimplementedServerServer()
+	mustEmbedUnimplementedMatchesServer()
 }
 
-// UnimplementedServerServer must be embedded to have
+// UnimplementedMatchesServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedServerServer struct{}
+type UnimplementedMatchesServer struct{}
 
-func (UnimplementedServerServer) GetPlayer(context.Context, *Player) (*PlayerSummary, error) {
+func (UnimplementedMatchesServer) GetPlayer(context.Context, *Player) (*PlayerSummary, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayer not implemented")
 }
-func (UnimplementedServerServer) GetMatchHistory(*Player, grpc.ServerStreamingServer[MatchResult]) error {
+func (UnimplementedMatchesServer) GetMatchHistory(*Player, grpc.ServerStreamingServer[MatchResult]) error {
 	return status.Errorf(codes.Unimplemented, "method GetMatchHistory not implemented")
 }
-func (UnimplementedServerServer) SendUpcomingMatches(grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]) error {
+func (UnimplementedMatchesServer) SendUpcomingMatches(grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]) error {
 	return status.Errorf(codes.Unimplemented, "method SendUpcomingMatches not implemented")
 }
-func (UnimplementedServerServer) ProcessMatchResults(grpc.BidiStreamingServer[MatchResult, MatchResult]) error {
+func (UnimplementedMatchesServer) ProcessMatchResults(grpc.BidiStreamingServer[MatchResult, MatchResult]) error {
 	return status.Errorf(codes.Unimplemented, "method ProcessMatchResults not implemented")
 }
-func (UnimplementedServerServer) mustEmbedUnimplementedServerServer() {}
-func (UnimplementedServerServer) testEmbeddedByValue()                {}
+func (UnimplementedMatchesServer) mustEmbedUnimplementedMatchesServer() {}
+func (UnimplementedMatchesServer) testEmbeddedByValue()                 {}
 
-// UnsafeServerServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ServerServer will
+// UnsafeMatchesServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MatchesServer will
 // result in compilation errors.
-type UnsafeServerServer interface {
-	mustEmbedUnimplementedServerServer()
+type UnsafeMatchesServer interface {
+	mustEmbedUnimplementedMatchesServer()
 }
 
-func RegisterServerServer(s grpc.ServiceRegistrar, srv ServerServer) {
-	// If the following call pancis, it indicates UnimplementedServerServer was
+func RegisterMatchesServer(s grpc.ServiceRegistrar, srv MatchesServer) {
+	// If the following call pancis, it indicates UnimplementedMatchesServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Server_ServiceDesc, srv)
+	s.RegisterService(&Matches_ServiceDesc, srv)
 }
 
-func _Server_GetPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Matches_GetPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Player)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServerServer).GetPlayer(ctx, in)
+		return srv.(MatchesServer).GetPlayer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Server_GetPlayer_FullMethodName,
+		FullMethod: Matches_GetPlayer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServerServer).GetPlayer(ctx, req.(*Player))
+		return srv.(MatchesServer).GetPlayer(ctx, req.(*Player))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Server_GetMatchHistory_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _Matches_GetMatchHistory_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Player)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ServerServer).GetMatchHistory(m, &grpc.GenericServerStream[Player, MatchResult]{ServerStream: stream})
+	return srv.(MatchesServer).GetMatchHistory(m, &grpc.GenericServerStream[Player, MatchResult]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Server_GetMatchHistoryServer = grpc.ServerStreamingServer[MatchResult]
+type Matches_GetMatchHistoryServer = grpc.ServerStreamingServer[MatchResult]
 
-func _Server_SendUpcomingMatches_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ServerServer).SendUpcomingMatches(&grpc.GenericServerStream[UpcomingMatch, MatchSummary]{ServerStream: stream})
+func _Matches_SendUpcomingMatches_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MatchesServer).SendUpcomingMatches(&grpc.GenericServerStream[UpcomingMatch, MatchSummary]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Server_SendUpcomingMatchesServer = grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]
+type Matches_SendUpcomingMatchesServer = grpc.BidiStreamingServer[UpcomingMatch, MatchSummary]
 
-func _Server_ProcessMatchResults_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ServerServer).ProcessMatchResults(&grpc.GenericServerStream[MatchResult, MatchResult]{ServerStream: stream})
+func _Matches_ProcessMatchResults_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MatchesServer).ProcessMatchResults(&grpc.GenericServerStream[MatchResult, MatchResult]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Server_ProcessMatchResultsServer = grpc.BidiStreamingServer[MatchResult, MatchResult]
+type Matches_ProcessMatchResultsServer = grpc.BidiStreamingServer[MatchResult, MatchResult]
 
-// Server_ServiceDesc is the grpc.ServiceDesc for Server service.
+// Matches_ServiceDesc is the grpc.ServiceDesc for Matches service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Server_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Server",
-	HandlerType: (*ServerServer)(nil),
+var Matches_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Matches",
+	HandlerType: (*MatchesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetPlayer",
-			Handler:    _Server_GetPlayer_Handler,
+			Handler:    _Matches_GetPlayer_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "GetMatchHistory",
-			Handler:       _Server_GetMatchHistory_Handler,
+			Handler:       _Matches_GetMatchHistory_Handler,
 			ServerStreams: true,
 		},
 		{
 			StreamName:    "SendUpcomingMatches",
-			Handler:       _Server_SendUpcomingMatches_Handler,
+			Handler:       _Matches_SendUpcomingMatches_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
 		{
 			StreamName:    "ProcessMatchResults",
-			Handler:       _Server_ProcessMatchResults_Handler,
+			Handler:       _Matches_ProcessMatchResults_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
